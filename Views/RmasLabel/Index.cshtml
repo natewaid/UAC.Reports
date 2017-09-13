@@ -1,0 +1,55 @@
+﻿@model UAC.Reports.Models.RmasLabelViewModel
+@using MvcReportViewer;
+
+@{
+    ViewBag.Title = "RMAS Labels";
+}
+
+<h3>RMAS Labels</h3>
+
+@using (Html.BeginForm("Index", "RmasLabel", FormMethod.Get, new { @class = "form-inline" }))
+{
+    var manno = Model.ManifestNumber == 0 ? "" : Model.ManifestNumber.ToString();
+    var planttype = Model.PlantType == 0 ? "" : Model.PlantType.ToString();
+
+    <div class="form-group">
+        <input class="form-control" id="ManifestNumber" name="ManifestNumber" placeholder="Manifest Number" type="text" value="@manno">
+    </div>
+    <div class="form-group">
+        
+        @Html.DropDownListFor(m => m.PlantType, new List<SelectListItem>
+            {
+                new SelectListItem { Value = "0", Text = "-- Select Plant Type --" },
+                new SelectListItem { Value = "1", Text = "Production (1)" },
+                new SelectListItem { Value = "2", Text = "Warehouse (2)" }
+            },
+            new { @class = "form-control" }
+        )
+
+    </div>
+
+    <button type="submit" class="btn btn-primary">Print</button>
+}
+
+@if (Model.ManifestNumber > 0 && Model.PlantType > 0)
+{
+    var prms = new List<KeyValuePair<string, object>>
+    {
+        new KeyValuePair<string, object>("Manno", Model.ManifestNumber),
+        new KeyValuePair<string, object>("PlantType", Model.PlantType)
+    };
+
+    @Html.MvcReportViewer(
+        reportPath: "/Production/RmasLabel",
+        reportParameters: prms,
+        controlSettings: new ControlSettings { PromptAreaCollapsed = true },
+        htmlAttributes: new { Height = 450, Width = 500, style = "border: none" }
+    )
+
+    @Html.MvcReportViewer(
+        reportPath: "/Production/RmasLabelReport",
+        reportParameters: prms,
+        controlSettings: new ControlSettings { PromptAreaCollapsed = true },
+        htmlAttributes: new { Height = 450, Width = 500, style = "border: none" }
+    )
+}
